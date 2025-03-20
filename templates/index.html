@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .chat-header {
+            background: #764ba2;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+        .chat-container {
+            width: 350px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .chatbox {
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            max-width: 75%;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            position: relative;
+            font-size: 14px;
+        }
+        .user {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+            border-top-right-radius: 2px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .bot {
+            background-color: #e0e0e0;
+            color: black;
+            align-self: flex-start;
+            border-top-left-radius: 2px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background: white;
+        }
+        input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            margin-left: 5px;
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Chatbot</div>
+        <div class="chatbox" id="chatbox"></div>
+        <div class="input-area">
+            <input type="text" id="userMessage" placeholder="Tulis pesan..." onkeypress="if(event.keyCode==13) sendMessage()">
+            <button onclick="sendMessage()">Kirim</button>
+        </div>
+    </div>
+    
+    <script>
+        async function sendMessage() {
+            let userMessage = document.getElementById("userMessage").value;
+            if (!userMessage.trim()) return;
+            
+            let chatbox = document.getElementById("chatbox");
+            let userBubble = document.createElement("div");
+            userBubble.className = "message user";
+            userBubble.textContent = userMessage;
+            chatbox.appendChild(userBubble);
+            chatbox.scrollTop = chatbox.scrollHeight;
+            
+            document.getElementById("userMessage").value = "";
+            
+            let response = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userMessage })
+            });
+            let data = await response.json();
+            
+            let botBubble = document.createElement("div");
+            botBubble.className = "message bot";
+            botBubble.textContent = data.response;
+            chatbox.appendChild(botBubble);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
